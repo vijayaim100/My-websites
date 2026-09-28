@@ -591,6 +591,11 @@ function setLearnedRulesArray(nextArray) {
     nameInput.value = "";
   }
 
+//SAVE CATEGORY
+   function saveCategories() {
+    localStorage.setItem("categories", JSON.stringify(categories));
+  }
+
   // DELETE ONLY: delete the selected category from current type
   function deleteCategoryInline() {
     const type = document.getElementById("type").value || "expense";
