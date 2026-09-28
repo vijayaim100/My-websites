@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expensglobe</title>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#020617">
+<link rel="apple-touch-icon" href="icons/192.png">
+<!-- For modern desktop browsers (PNG format) -->
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/16.png">
+<link rel="stylesheet" href="style.css">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- jsPDF + AutoTable for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script> <!-- [web:276][web:341] -->
+
+<script>
+  if (localStorage.getItem("appUnlocked") !== "true") {
+    window.location.replace("/buynow.html");
+  }
+</script>
+
+
+    
+</head>
+
+    <body>
+  <!-- Lock screen wrapper (centered) -->
+  <div id="lockScreen">
+    <div class="lock-card">
+      <div class="lock-title">Expensglobe lock</div>
+      <div class="lock-subtitle">
+        Enter your password to unlock. First time, set a new password.
+      </div>
+
+      <!-- Password -->
+<input type="password" id="lockPassword" placeholder="Password">
+
+<!-- Security questions (hidden by default, shown only on first setup or forgot flow) -->
+<div id="securitySetupArea" style="display:none;margin-top:12px;">
+  <div style="font-size:13px;margin-bottom:6px;">Set 3 security questions:</div>
+
+  <!-- Question 1 -->
+  <select id="sq1_q" style="width:100%;margin-bottom:6px;padding:8px;">
+    <option value="">Select question 1</option>
+    <option value="q1">What was the name of your first pet?</option>
+    <option value="q2">What is your mother’s maiden name?</option>
+    <option value="q3">What city were you born in?</option>
+    <option value="q4">What was the name of your elementary school?</option>
+    <option value="q5">What is your favorite book?</option>
+    <option value="q6">What is your favorite movie?</option>
+    <option value="q7">What is your favorite food?</option>
+    <option value="q8">What is the name of your best friend from childhood?</option>
+    <option value="q9">What is your favorite sports team?</option>
+    <option value="q10">What was the make/model of your first car?</option>
+    <option value="11">What is your favorite hobby?</option>
+    <option value="12">What is your favorite color?</option>
+  </select>
+  <input type="text" id="sq1_a" placeholder="Answer 1" style="width:100%;margin-bottom:10px;padding:8px;">
+
+  <!-- Question 2 -->
+  <select id="sq2_q" style="width:100%;margin-bottom:6px;padding:8px;">
+    <option value="">Select question 2</option>
+    <option value="q1">What was the name of your first pet?</option>
+    <option value="q2">What is your mother’s maiden name?</option>
+    <option value="q3">What city were you born in?</option>
+    <option value="q4">What was the name of your elementary school?</option>
+    <option value="q5">What is your favorite book?</option>
+    <option value="q6">What is your favorite movie?</option>
+    <option value="q7">What is your favorite food?</option>
+    <option value="q8">What is the name of your best friend from childhood?</option>
+    <option value="q9">What is your favorite sports team?</option>
+    <option value="q10">What was the make/model of your first car?</option>
+    <option value="11">What is your favorite hobby?</option>
+    <option value="12">What is your favorite color?</option>
+
+  </select>
+  <input type="text" id="sq2_a" placeholder="Answer 2" style="width:100%;margin-bottom:10px;padding:8px;">
+
+  <!-- Question 3 -->
+  <select id="sq3_q" style="width:100%;margin-bottom:6px;padding:8px;">
+    <option value="">Select question 3</option>
+    <option value="q1">What was the name of your first pet?</option>
+    <option value="q2">What is your mother’s maiden name?</option>
+    <option value="q3">What city were you born in?</option>
+    <option value="q4">What was the name of your elementary school?</option>
+    <option value="q5">What is your favorite book?</option>
+    <option value="q6">What is your favorite movie?</option>
+    <option value="q7">What is your favorite food?</option>
+    <option value="q8">What is the name of your best friend from childhood?</option>
+    <option value="q9">What is your favorite sports team?</option>
+    <option value="q10">What was the make/model of your first car?</option>
+    <option value="11">What is your favorite hobby?</option>
+    <option value="12">What is your favorite color?</option>
+
+  </select>
+  <input type="text" id="sq3_a" placeholder="Answer 3" style="width:100%;margin-bottom:10px;padding:8px;">
+</div>
+
+<button id="lockBtn" >Unlock / Set password</button>
+
+<button id="forgotPasswordBtn" class="btn-subtle" style="margin-top:8px;">
+  Forgot password?
+</button>
+
+<button id="lockClearBtn" class="btn-subtle" style="margin-top:8px;">
+  Clear saved password
+</button>
+
+<!-- Forgot/reset area -->
+<div id="resetArea" style="display:none;margin-top:12px;">
+  <div style="font-size:13px;margin-bottom:6px;">Answer your security questions:</div>
+
+  <div id="resetQuestions"></div>
+
+  <input type="password" id="newPassword" placeholder="New password" style="width:100%;margin-top:10px;padding:8px;">
+  <input type="password" id="confirmNewPassword" placeholder="Confirm new password" style="width:100%;margin-top:6px;padding:8px;">
+
+  <button id="resetConfirmBtn" style="width:100%;margin-top:10px;padding:10px;">Reset password</button>
+  <button id="resetCancelBtn" class="btn-subtle" style="width:100%;margin-top:6px;padding:8px;">Cancel</button>
+</div>
+<p><a href="/Expensglobe user guide v1.pdf" target="_blank" rel="noopener" style="color:#888; text-decoration:underline;">
+        📘 User Guide(PDF)
+      </a></p>
+    </div>
+    
+  </div>
+
+  <!-- APP (hidden until unlocked) -->
+  <div id="app" style="display:none;">
+    <div class="container">
+      <!-- Header -->
+      <div class="app-header">
+        <div class="app-title">
+          <img src="/my applogo/my logo72.png" alt="App logo" class="app-logo">
+          <h2>Expensglobe</h2>
+          <span style="font-size: small;">Multi-Currency Expense Tracker with customizable categories</span>
+        </div>
+        
+         <div class="header-controls" >
+    <nav class="quick-nav" aria-label="Page sections">
+      <a href="#expenseLog">Expense Log</a>
+      <a href="#charts">Charts</a>
+      <a href="#recentActivity">Recent Activity</a>
+    </nav>
+        <div class="app-actions" >
+          <button id="themeToggle" class="btn-subtle btn-inline" style="border-color: #38bdf8; border-width: 1px;">
+            🌙 Night
+          </button>
+          <button id="exportExcelBtn" class="btn-subtle btn-inline" style="border-color: #38bdf8; border-width: 1px;">
+            CSV / Sheets
+          </button>
+          <button id="exportPdfBtn" class="btn-subtle btn-inline" style="border-color: #38bdf8; border-width: 1px;">
+            PDF
+          </button>
+          </div>  </div>
+       
+
+        <div class="card total" >
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px; font-size: 1.5rem;" >
+            <span >Balance: <span id="balance">0.00</span></span>
+          </div>
+        </div>
+      </div>
+
+  
+
+      <!-- Entry card -->
+      <div class="card" id="expenseLog" >
+        <b><label for="amount" style="color: #38bdf8;">Amount</label></b>
+        <input type="number" id="amount" placeholder="Amount">
+        <b><label for="description" style="color: #38bdf8;">description</label></b>
+        <input type="text" id="description" placeholder="Description">
+
+        <!-- Core financial type: income vs expense -->
+        <b><label for="type" style="color: #38bdf8;">Select Transaction Type</label></b>
+        <select id="type">
+          <option value="expense" selected>Expense</option>
+          <option value="income">Income</option>
+        </select>
+
+        <!-- Category + inline editable controls -->
+        <b><label for="category" style="color: #38bdf8;">Select Category</label></b>
+        <div class="category-row">
+          <select id="category"></select>
+
+          <div class="category-edit-controls">
+            <input type="text" id="catEditName" placeholder="Add / delete category">
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn-subtle btn-inline" id="catEditSaveBtn" style="border-color: #38bdf8; border-width: 1px;">
+                Save
+              </button>
+              <button type="button" class="btn-subtle btn-inline" id="catEditDeleteBtn" style="border-color: #38bdf8; border-width: 1px;">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment mode / transaction type (UPI, Cash, Bank, etc.) -->
+        <b><label for="paymentMode" style="color: #38bdf8;">Payment Method</label></b>
+        <select id="paymentMode">
+          <option value="upi" selected>UPI</option>
+          <option value="cash">Cash</option>
+          <option value="bank">Bank transfer</option>
+          <option value="card">Card</option>
+          <option value="cheque">Cheque</option>
+          <option value="other">Other</option>
+        </select>
+
+        <b><label for="currency" style="color: #38bdf8;">select currency</label></b>
+        <select id="currency">
+          <option value="INR">INR</option>
+          <option value="USD" selected>USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+        </select>
+        <div class="currency-hint">
+         <small>NOTE: Pick any one base currency to calculate summaries. It’s also the default for new transactions.</small>
+        </div>
+
+        <button style="margin-top:12px; border: 5px outset #38bdf8;" onclick="addTransaction()">Add transaction</button>
+      </div>
+      
+    <!-- Summary Section -->
+<div class="card" id="summaryCard">
+  <div class="summary-header">
+    <b><span>Summary</span></b>
+    <small id="summaryBaseCurrencyLabel"></small>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="summary-label">Total Monthly Income</div>
+      <div class="summary-value" id="summaryMonthlyIncome">0.00</div>
+    </div>
+
+    <div class="summary-item">
+      <div class="summary-label">Total Monthly Expenses</div>
+      <div class="summary-value" id="summaryMonthlyExpenses">0.00</div>
+    </div>
+
+    <div class="summary-item">
+      <div class="summary-label">Net Savings</div>
+      <div class="summary-value" id="summaryNetSavings">0.00</div>
+    </div>
+  </div>
+
+  <div class="top-categories">
+    <b><span>Top spending categories</span></b>
+    <ul id="summaryTopCategories"></ul>
+  </div>
+</div>
+
+      <!-- Charts: pie + weekly bar -->
+      <div class="card" id="charts">
+        <div class="chart-grid">
+          <div class="chart-wrapper">
+            <div class="chart-title">Income vs expense</div>
+            <canvas id="pieChart"></canvas>
+          </div>
+
+          <div class="chart-wrapper">
+            <div class="analytics-header">
+              <div class="chart-title">Weekly spending</div>
+              <span>Last 7 days</span>
+            </div>
+            <canvas id="weeklyChart" style="height: 300px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly bar chart -->
+      <div class="card">
+        <div class="chart-wrapper">
+          <div class="chart-title">Monthly flow</div>
+          <canvas id="barChart" style="margin-top:8px;"></canvas>
+        </div>
+      </div>
+
+      <!-- List -->
+      <div class="card" id="recentActivity">
+        <div class="list-header">
+          <b><span>Recent activity</span></b>
+          <button class="btn-subtle btn-inline" onclick="confirmReset()" style="border: 3px inset red;">
+            Reset all
+          </button>
+          <b><span id="txCountLabel">0 items</span></b>
+        </div>
+
+        
+        <b><div id="list"></div></b>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB Quick-add -->
+  <button class="fab" id="fabBtn" aria-label="Quick add transaction">
+    +
+  </button>
+
+  <!-- Quick-add Modal -->
+  <div class="modal-overlay" id="quickModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Quick add</div>
+          <div class="modal-subtitle">Capture an income or expense in a few taps.</div>
+        </div>
+        <div class="modal-close" id="modalCloseBtn">&times;</div>
+      </div>
+
+      <input type="number" id="quickAmount" placeholder="Amount">
+      <input type="text" id="quickDescription" placeholder="Description">
+
+      <!-- Core type -->
+      <select id="quickType" style="margin-top:10px;">
+        <option value="expense" selected>Expense</option>
+        <option value="income">Income</option>
+      </select>
+
+      <!-- Payment mode -->
+      <select id="quickPaymentMode" style="margin-top:10px;">
+        <option value="upi">UPI</option>
+        <option value="cash">Cash</option>
+        <option value="bank">Bank transfer</option>
+        <option value="card">Card</option>
+        <option value="cheque">Cheque</option>
+        <option value="other">Other</option>
+      </select>
+
+      <select id="quickCategory" style="margin-top:10px;"></select>
+      <select id="quickCurrency" style="margin-top:10px;">
+        <option>INR</option>
+        <option selected>USD</option>
+        <option>EUR</option>
+        <option>GBP</option>
+      </select>
+
+      <div class="modal-footer">
+        <button class="btn-subtle" type="button" id="quickCancel">Cancel</button>
+        <button type="button" onclick="addQuickTransaction()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Transaction details</div>
+          <div class="modal-subtitle">View full information about this entry.</div>
+          
+        </div>
+        <div class="modal-close" id="detailCloseBtn">&times;</div>
+      </div>
+
+      <div id="detailContent"></div>
+    </div>
+    
+  </div>
+  <footer style="text-align:center; padding:16px; font-size:14px; color:#888;">
+      <a href="/Expensglobe user guide v1.pdf" target="_blank" rel="noopener" style="color:#888; text-decoration:underline;">
+        📘 Read the User Guide(PDF)
+      </a> <br><br>
+<b><a href="#expenseLog" style="border:2PX solid #38bdf8; color: #38bdf8;text-decoration: none; border-radius: 10px; padding: 6px;">Go to Top </a></b>
+    </footer>
+<script src="/dexie.js"></script>
+  <script src="/App.js" defer></script>
+  
+</body>
+</html>

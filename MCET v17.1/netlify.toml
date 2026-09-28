@@ -1,0 +1,8 @@
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/validate-license"
+  to = "/.netlify/functions/validate-license"
+  status = 200
+  force = true
