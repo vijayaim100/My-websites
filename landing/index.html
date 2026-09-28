@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>
+    ExpensGlobe — Multi-Currency Expense Tracker
+  </title>
+
+  <meta
+    name="description"
+    content="ExpensGlobe is a simple expense tracker with multi-currency support, customizable categories, PDF and CSV exports, and an installable PWA experience."
+  />
+
+  <meta name="theme-color" content="#07111f" />
+
+  <!--<link rel="manifest" href="/manifest.json" />-->
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1b2f;
+      --card: #10243c;
+      --text: #f4f8ff;
+      --muted: #a9bad0;
+      --primary: #38bdf8;
+      --primary-light: #7dd3fc;
+      --green: #22c55e;
+      --red: #fb7185;
+      --border: rgba(255, 255, 255, 0.13);
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(18, 76, 120, 0.55),
+          transparent 35%
+        ),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin: auto;
+    }
+
+    .site-header {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #818cf8);
+      color: #06111e;
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #03111d;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 0.9fr;
+      align-items: center;
+      gap: 65px;
+      padding: 90px 0 80px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 6px 12px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      max-width: 700px;
+      margin: 0;
+      font-size: clamp(42px, 6vw, 70px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .hero-copy {
+      max-width: 650px;
+      margin: 24px 0 30px;
+      color: var(--muted);
+      font-size: 19px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .hero-features span,
+    .currency-label {
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.08);
+      color: #ccefff;
+      font-size: 12px;
+    }
+
+    .trust-line {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dashboard-preview {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(16, 36, 60, 0.85);
+      box-shadow: var(--shadow);
+      transform: rotate(1deg);
+    }
+
+    .window-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .window-bar span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    .preview-inner {
+      padding: 20px;
+      border-radius: 14px;
+      background: #091827;
+    }
+
+    .preview-title {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .preview-balance {
+      margin: 5px 0 18px;
+      color: var(--primary);
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .currency-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .preview-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-soft);
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .transaction {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .transaction small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .income {
+      color: var(--green);
+    }
+
+    .expense {
+      color: var(--red);
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    .section-heading {
+      max-width: 720px;
+      margin-bottom: 35px;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.1;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(16, 36, 60, 0.72);
+    }
+
+    .feature-card:hover {
+      border-color: rgba(56, 189, 248, 0.45);
+    }
+
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 18px;
+      border-radius: 13px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .feature-card h3 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .step {
+      padding: 25px;
+      border-left: 3px solid var(--primary);
+      background: var(--bg-soft);
+    }
+
+    .step-number {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .step h3 {
+      margin: 8px 0;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .export-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .export-card,
+    .install-box {
+      padding: 30px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(14, 64, 96, 0.8),
+          rgba(16, 36, 60, 0.8)
+        );
+    }
+
+    .export-card h3 {
+      margin-top: 0;
+      font-size: 25px;
+    }
+
+    .export-card p,
+    .export-card li {
+      color: var(--muted);
+    }
+
+    .install-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .install-box h2 {
+      margin-top: 0;
+      font-size: 32px;
+    }
+
+    .install-box li {
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .price-card {
+      padding: 32px;
+      border: 2px solid var(--primary);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .price-card h3 {
+      margin-top: 0;
+    }
+
+    .price {
+      margin: 12px 0;
+      font-size: 44px;
+      font-weight: 900;
+    }
+
+    .price-note {
+      color: var(--muted);
+    }
+
+    .price-card li {
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    .already-purchased {
+      display: block;
+      margin-top: 15px;
+      color: var(--primary);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .faq {
+      display: grid;
+      gap: 12px;
+    }
+
+    details {
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(16, 36, 60, 0.65);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    details p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .final-cta {
+      padding: 65px 25px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #075985, #164e63);
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 4vw, 48px);
+    }
+
+    .final-cta p {
+      max-width: 650px;
+      margin: 0 auto 25px;
+      color: #c9e9f7;
+    }
+
+    footer {
+      padding: 30px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    @media (max-width: 850px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero,
+      .pricing,
+      .install-box,
+      .export-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        gap: 40px;
+        padding-top: 60px;
+      }
+
+      .feature-grid,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-preview {
+        transform: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        width: calc(100% - 28px);
+      }
+
+      .nav .btn {
+        min-height: 42px;
+        padding: 9px 13px;
+        font-size: 13px;
+      }
+
+      .hero-copy {
+        font-size: 17px;
+      }
+
+      .actions,
+      .actions .btn {
+        width: 100%;
+      }
+
+      .preview-inner,
+      .price-card,
+      .install-box,
+      .export-card {
+        padding: 20px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+      }
+    }
+    .single-page-note {
+  max-width: 650px;
+  margin: 18px 0 0;
+  color: var(--primary-light);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/">
+        <span class="brand-icon">E</span>
+        <span>ExpensGlobe</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#exports">Exports</a>
+        <a href="#install">Install</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a
+        class="btn btn-primary"
+        href="https://vijaykumar524.gumroad.com/l/majlg"
+        target="_blank"
+        rel="noopener"
+      >
+        Buy ExpensGlobe
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <div>
+        <span class="eyebrow">
+          Flexible personal finance tracking
+        </span>
+
+        <h1>
+          Track expenses in every currency that matters to you.
+        </h1>
+
+        <p class="hero-copy">
+          ExpensGlobe helps you track income and expenses across multiple
+          currencies, customize your categories, export your records to PDF
+          or CSV, and install the app on your phone or computer.
+        </p>
+        <p class="single-page-note">
+  ExpensGlobe is a lightweight, single-page expense tracker designed for
+  quick viewing. Your transactions, logs, summaries, and charts are arranged
+  on one page—just scroll to view everything without opening multiple screens.
+</p> <br><br>
+
+        <div class="actions">
+          <a
+            class="btn btn-primary"
+            href="https://vijaykumar524.gumroad.com/l/majlg"
+            target="_blank"
+            rel="noopener"
+          >
+            Buy ExpensGlobe
+          </a>
+
+          <a class="btn btn-secondary" href="#features">
+            Explore features
+          </a>
+        </div>
+
+        <div class="hero-features">
+          <span>🌍 Multi-currency</span>
+          <span>✦ Custom categories</span>
+          <span>📄 PDF export</span>
+          <span>📊 CSV export</span>
+          <span>▣ Installable PWA</span>
+        </div>
+
+        <p class="trust-line">
+          Offline-first · One-time purchase · Designed for simplicity
+        </p>
+      </div>
+
+      <div class="dashboard-preview" aria-label="ExpensGlobe dashboard preview">
+        <div class="window-bar">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="preview-inner">
+          <div class="preview-title">
+            Recent Transactions
+          </div>
+
+          <div class="preview-balance">
+            Multi-currency
+          </div>
+
+          <div class="currency-row">
+            <span class="currency-label">INR ₹</span>
+            <span class="currency-label">USD $</span>
+            <span class="currency-label">EUR €</span>
+            <span class="currency-label">GBP £</span>
+          </div>
+
+          <div class="preview-stats">
+            <div class="stat">
+              <small>Income · INR</small>
+              <strong class="income">+₹40,000</strong>
+            </div>
+
+            <div class="stat">
+              <small>Expenses · USD</small>
+              <strong class="expense">−$45.00</strong>
+            </div>
+          </div>
+
+          <div class="transaction">
+            <div>
+              <strong>Groceries</strong>
+              <small>Food · India · INR</small>
+            </div>
+
+            <strong class="expense">−₹1,250</strong>
+          </div>
+
+          <div class="transaction">
+            <div>
+              <strong>Software subscription</strong>
+              <small>Business · United States · USD</small>
+            </div>
+
+            <strong class="expense">−$45.00</strong>
+          </div>
+
+          <div class="transaction">
+            <div>
+              <strong>Travel expense</strong>
+              <small>Travel · Europe · EUR</small>
+            </div>
+
+            <strong class="expense">−€32.50</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section-heading">
+          <h2>
+            Powerful enough for flexibility. Simple enough for everyday use.
+          </h2>
+
+          <p>
+            Customize your financial records around the currencies,
+            categories, and reports you actually need.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon">₹</div>
+            <h3>Track income and expenses</h3>
+            <p>
+              Record daily spending, income, payments, and other
+              financial activity in one organized place.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3>Multi-currency support</h3>
+            <p>
+              Record and organize transactions using multiple currencies
+              for travel, work, household, or international expenses.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>Customizable categories</h3>
+            <p>
+              Add categories that match your lifestyle and delete
+              categories that you no longer need.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">✓</div>
+            <h3>Organize Transactions</h3>
+            <p>
+              Keep your Transactions list clear with descriptions, dates,
+              amounts, currencies, categories, and labels.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">PDF</div>
+            <h3>Export to PDF</h3>
+            <p>
+              Create readable PDF reports for reviewing, printing,
+              sharing, or keeping for your records.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">CSV</div>
+            <h3>Export to CSV</h3>
+            <p>
+              Export transaction data for spreadsheets, analysis,
+              accounting, or backup.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">▣</div>
+            <h3>Spending summaries</h3>
+            <p>
+              View balances, income, expenses, and spending patterns
+              from a clear dashboard.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">⌁</div>
+            <h3>Offline-first experience</h3>
+            <p>
+              Continue using supported features offline after the app has
+              been loaded and cached on your device.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">↓</div>
+            <h3>Installable as an app</h3>
+            <p>
+              Add ExpensGlobe to your Home screen or desktop and open it
+              like a regular application.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <h2>
+            Set up your finances your way.
+          </h2>
+
+          <p>
+            Start with a simple workflow and customize it as your needs
+            grow.
+          </p>
+        </div>
+
+        <div class="steps">
+          <article class="step">
+            <div class="step-number">STEP 01</div>
+            <h3>Choose your currency</h3>
+            <p>
+              Select the currencies you want to use for your financial
+              records and transactions.
+            </p>
+          </article>
+
+          <article class="step">
+            <div class="step-number">STEP 02</div>
+            <h3>Customize categories</h3>
+            <p>
+              Add categories such as Food, Transport, Bills, Shopping,
+              Health, or any category you need.
+            </p>
+          </article>
+
+          <article class="step">
+            <div class="step-number">STEP 03</div>
+            <h3>Review and export</h3>
+            <p>
+              View your Transactions, understand your spending, and
+              export your records to PDF or CSV.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="exports" class="section">
+      <div class="container">
+        <div class="section-heading">
+          <h2>
+            Take your financial data with you.
+          </h2>
+
+          <p>
+            Export your records whenever you need to review, print,
+            share, or analyze them.
+          </p>
+        </div>
+
+        <div class="export-grid">
+          <article class="export-card">
+            <h3>📄 PDF reports</h3>
+
+            <p>
+              Generate a clean PDF report of your selected financial
+              records.
+            </p>
+
+            <ul>
+              <li>Review your spending clearly.</li>
+              <li>Print or share your report.</li>
+              <li>Keep monthly financial records.</li>
+            </ul>
+          </article>
+
+          <article class="export-card">
+            <h3>📊 CSV data</h3>
+
+            <p>
+              Export your transaction data in CSV format for use with
+              spreadsheet and accounting tools.
+            </p>
+
+            <ul>
+              <li>Open the file in spreadsheet software.</li>
+              <li>Analyze your transactions.</li>
+              <li>Keep a separate copy of your records.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="install" class="section">
+      <div class="container">
+        <div class="install-box">
+          <div>
+            <h2>
+              Install ExpensGlobe like an app.
+            </h2>
+
+            <p>
+              ExpensGlobe is a Progressive Web App. Use it in your
+              browser or install it on a supported phone or computer for
+              quick access.
+            </p>
+
+            <p>
+              No traditional app-store download is required.
+            </p>
+          </div>
+
+          <div>
+            <h3>Android</h3>
+
+            <ol>
+              <li>Open ExpensGlobe in Chrome.</li>
+              <li>Tap the three-dot menu.</li>
+              <li>Select Install app or Add to Home screen.</li>
+            </ol>
+
+            <h3>iPhone</h3>
+
+            <ol>
+              <li>Open ExpensGlobe in Safari.</li>
+              <li>Tap the Share button.</li>
+              <li>Select Add to Home Screen.</li>
+            </ol>
+
+            <h3>Windows or Mac</h3>
+
+            <ol>
+              <li>Open ExpensGlobe in Chrome or Edge.</li>
+              <li>Click the browser install icon.</li>
+              <li>Select Install ExpensGlobe.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="section">
+      <div class="container pricing">
+        <div>
+          <div class="section-heading">
+            <h2>
+              Everything essential in one focused expense tracker.
+            </h2>
+
+            <p>
+              Manage your transactions, customize your setup, and export
+              your data whenever you need it.
+            </p>
+          </div>
+        </div>
+
+        <div class="price-card">
+          <h3>ExpensGlobe Full Access</h3>
+
+          <div class="price">
+           $ 14.99
+          </div>
+
+          <p class="price-note">
+            One-time purchase · No recurring subscription
+          </p>
+
+          <ul>
+            
+            <li>Support for multiple currencies.</li>
+            <li>Add and delete custom categories.</li>
+            <li>Lightweight and fast.</li>
+            <li>Export records to PDF.</li>
+            <li>Export data to CSV.</li>
+            <li>Simple expense charts.</li>
+            <li>Install as a Progressive Web App.</li>
+            <li>Activate with a Gumroad license key.</li>
+            <li>Pay once, full access forever, No ads, No tracker</li>
+          </ul>
+
+          <a
+            class="btn btn-primary"
+            href="https://vijaykumar524.gumroad.com/l/majlg"
+            target="_blank"
+            rel="noopener"
+          >
+            Buy ExpensGlobe
+          </a>
+
+          <a class="already-purchased" href="https://expensglobev2.netlify.app/unlock.html">
+            Already purchased? Activate your license
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="container">
+        <div class="section-heading">
+          <h2>
+            Frequently asked questions
+          </h2>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              What is ExpensGlobe?
+            </summary>
+
+            <p>
+              ExpensGlobe is an expense tracker for recording income,
+              expenses, and other financial transactions.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              Does ExpensGlobe support multiple currencies?
+            </summary>
+
+            <p>
+              Yes. ExpensGlobe supports transactions in multiple
+              currencies according to the currency options available in
+              the app.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              Can I customize categories?
+            </summary>
+
+            <p>
+              Yes. You can add categories that suit your needs and delete
+              categories that you no longer want to use.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              Can I export my transactions?
+            </summary>
+
+            <p>
+              Yes. ExpensGlobe supports exporting financial records to
+              PDF and CSV formats.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              Is ExpensGlobe a mobile app?
+            </summary>
+
+            <p>
+              ExpensGlobe is a Progressive Web App. You can use it in a
+              browser and install it on supported devices like an app.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              How do I activate my purchase?
+            </summary>
+
+            <p>
+              After purchasing through Gumroad, copy the license key from
+              your receipt or purchase page and paste it into the
+              ExpensGlobe unlock page.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              Is there a monthly subscription?
+            </summary>
+
+            <p>
+              ExpensGlobe is offered as a one-time purchase. Check the
+              Gumroad checkout page for the current price and purchase
+              details.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="final-cta">
+          <h2>
+            Take control of your everyday spending.
+          </h2>
+
+          <p>
+            Track transactions, use multiple currencies, customize your
+            categories, and export your records whenever you need them.
+          </p>
+
+          <a
+            class="btn btn-primary"
+            href="https://vijaykumar524.gumroad.com/l/majlg"
+            target="_blank"
+            rel="noopener"
+          >
+            Buy ExpensGlobe
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span>
+        © 2026 ExpensGlobe. All rights reserved.
+      </span>
+
+      <span>
+        <a href="/privacy.html">Privacy</a>
+        ·
+        <a href="/terms.html">Terms</a>
+        ·
+        
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch((error) => {
+          console.warn(
+            "Service worker registration failed:",
+            error
+          );
+        });
+      });
+    }
+  </script>
+</body>
+</html>
